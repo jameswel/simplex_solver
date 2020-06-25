@@ -73,27 +73,25 @@ addSlackVar = (data) => {
 getPivotRow = (data) => {
   const colum = data.length - 1
   var temp = [];
-  for(var i = 0; i < data[colum].length-1; i++)
+  for (var i = 0; i < data[colum].length - 1; i++)
     temp.push(data[colum][i])
   return temp.indexOf(Math.max(...temp));
 }
 
 getPivotColum = (data, pivotRow) => {
-  const colum = data.length-1
+  const colum = data.length - 1
   const rowlength = data[0].length - 1
   var temp = []
   for (var i = 0; i < colum; i++) {
-    if (data[i][pivotRow] !== 0 || data[i][rowlength] !== 0) {
-      //console.log(data[i][rowlength-1])
+    if (data[i][pivotRow] > 0 || data[i][rowlength] > 0) {
+
       temp.push(data[i][rowlength] / data[i][pivotRow])
-    } else {
-      temp.push(0)
-    }
+    } else temp.push(0)
   }
   var result
   temp.map(element => {
-    if(result === undefined) result = element
-    if(element < result && element > 0)
+    if (result === undefined && element > 0) result = element
+    if (element < result && element > 0)
       result = element
   })
   return temp.indexOf(result);
@@ -105,63 +103,42 @@ getPivotElement = (data) => {
 
 simplex = (data) => {
   var status = true
-  for (var l = 0; status = true; l++) {
+  for (var l = 0; status === true; l++) {
     var pivPos = getPivotElement(data);
-    //console.log(pivPos)
     const rowlength = data[0].length
     var pivElement = data[pivPos[1]][pivPos[0]]
     for (var i = 0; i < rowlength; i++) {
-      data[pivPos[1]][i] = Math.round((data[pivPos[1]][i] / pivElement) * 100 + Number.EPSILON) / 100;
-
+      data[pivPos[1]][i] = (data[pivPos[1]][i] / pivElement);
     }
     for (var i = 0; i < data.length; i++) {
       if (i !== pivPos[1]) {
-        //console.log(`${i} ${pivPos}`)
         var temp = data[i][pivPos[0]]
         var tempFaktor = temp * 1;
-        //console.log(tempFaktor)
         for (var k = 0; k < rowlength; k++) {
-          data[i][k] = Math.round((data[i][k] - (data[pivPos[1]][k] * tempFaktor)) * 100 + Number.EPSILON) / 100;
+          data[i][k] = (data[i][k] - (data[pivPos[1]][k] * tempFaktor));
         }
       }
     }
-    if (Math.max(...data[data.length - 1]) > 0) {
-      console.log(l)
-      //console.table(data)
-    }
-    else {
-      console.log('break')
+    if (!Math.max(...data[data.length - 1]) > 0) {
+      //console.log('break')
       status = false
       break;
     }
   }
-
   return data
 }
 
 final = (data, width) => {
-  var result = []
-  for (var i = 0; i < width; i++) {
-    var temp = false
-    var pos
-    for (var k = 0; k < data.length; k++) {
-      //console.log(`Here ${data[k][i]}`)
-      if (data[k][i] !== 0) {
-        if (data[k][i] !== 1 || temp === true) {
-          //console.log('break')
-          k = data.length
-        } else {
-          temp = true
-          pos = k
-        }
-      }
-      if (k === data.length - 1) {
-
-        result.push = { i: data[pos][i] }
-      }
-    }
+  function variables (result) {
+    this.result = result
   }
-  console.log(result)
+  var temp = {}
+  for(var i = width; i < data[0].length; i++) {
+    if(i !== data[0].length -1) 
+      temp[`x${i-width}`] = new variables(Math.abs(Math.round(data[data.length -1][i]* 100) /100))
+    else temp.obj = new variables(Math.abs(Math.round(data[data.length -1][i]* 100) /100))
+  }
+  console.table(temp)
 }
 
 handler = async () => {
@@ -173,9 +150,10 @@ handler = async () => {
   const width = data.transposed[0].length - 1
   data.slack = addSlackVar(data.transposed)
   data.simplex = simplex(data.slack)
-  console.table(data.simplex)
-  //data.result = final(data.simplex, width)
-
+  if(process.argv[3] === 'table' ){
+    console.table(data.simplex)
+  }
+  data.result = final(data.simplex, width)
 };
 
 handler();
