@@ -72,20 +72,31 @@ addSlackVar = (data) => {
 
 getPivotRow = (data) => {
   const colum = data.length - 1
-  return data[colum].indexOf(Math.max(...data[colum]));
+  var temp = [];
+  for(var i = 0; i < data[colum].length-1; i++)
+    temp.push(data[colum][i])
+  return temp.indexOf(Math.max(...temp));
 }
 
 getPivotColum = (data, pivotRow) => {
-  const colum = data.length - 1
+  const colum = data.length-1
   const rowlength = data[0].length - 1
   var temp = []
   for (var i = 0; i < colum; i++) {
-    //data[i][rowlength] = data[i][rowlength]/data[i][pivotRow]
-    if (data[i][pivotRow] !== 0)
+    if (data[i][pivotRow] !== 0 || data[i][rowlength] !== 0) {
+      //console.log(data[i][rowlength-1])
       temp.push(data[i][rowlength] / data[i][pivotRow])
-    else temp.push('/')
+    } else {
+      temp.push(0)
+    }
   }
-  return temp.indexOf(Math.min(...temp));
+  var result
+  temp.map(element => {
+    if(result === undefined) result = element
+    if(element < result && element > 0)
+      result = element
+  })
+  return temp.indexOf(result);
 }
 
 getPivotElement = (data) => {
@@ -93,55 +104,46 @@ getPivotElement = (data) => {
 }
 
 simplex = (data) => {
-  const decN = 10000; 
   var status = true
-  while (status) {
+  for (var l = 0; status = true; l++) {
     var pivPos = getPivotElement(data);
+    //console.log(pivPos)
     const rowlength = data[0].length
     var pivElement = data[pivPos[1]][pivPos[0]]
     for (var i = 0; i < rowlength; i++) {
-      data[pivPos[1]][i] = Math.round((data[pivPos[1]][i] / pivElement) * decN + Number.EPSILON) / decN;
+      data[pivPos[1]][i] = Math.round((data[pivPos[1]][i] / pivElement) * 100 + Number.EPSILON) / 100;
 
     }
     for (var i = 0; i < data.length; i++) {
-
       if (i !== pivPos[1]) {
+        //console.log(`${i} ${pivPos}`)
         var temp = data[i][pivPos[0]]
         var tempFaktor = temp * 1;
+        //console.log(tempFaktor)
         for (var k = 0; k < rowlength; k++) {
-          
-          if (temp === pivElement) {
-            data[i][k] = Math.round((data[i][k] - data[pivPos[1]][k]) * decN + Number.EPSILON) / decN;
-          }
-          else if (temp < pivElement) {
-            data[i][k] = Math.round((data[i][k] - (data[pivPos[1]][k] * tempFaktor)) * decN + Number.EPSILON) / decN;
-          }
-          else if (temp > pivElement) {
-            data[i][k] = Math.round((data[i][k] - (data[pivPos[1]][k] * tempFaktor)) * decN + Number.EPSILON) / decN;
-          }
+          data[i][k] = Math.round((data[i][k] - (data[pivPos[1]][k] * tempFaktor)) * 100 + Number.EPSILON) / 100;
         }
       }
     }
-    if (Math.max(...data[data.length - 1]) > 0)
-      console.log('again')
+    if (Math.max(...data[data.length - 1]) > 0) {
+      console.log(l)
+      //console.table(data)
+    }
     else {
-      // console.log('nicht nochmal')
-      // console.log(Math.max(...data[data.length-1]));
+      console.log('break')
       status = false
+      break;
     }
   }
+
   return data
 }
 
 final = (data, width) => {
   var result = []
-  //console.log(data)
-  //console.log(width)
   for (var i = 0; i < width; i++) {
-    //console.log('new round')
     var temp = false
     var pos
-    //console.log(data.length)
     for (var k = 0; k < data.length; k++) {
       //console.log(`Here ${data[k][i]}`)
       if (data[k][i] !== 0) {
@@ -152,14 +154,13 @@ final = (data, width) => {
           temp = true
           pos = k
         }
-
       }
-      if (k === (data.length - 1)) {
-        result.push({[i]: data[pos][data[0].length-1] })
+      if (k === data.length - 1) {
+
+        result.push = { i: data[pos][i] }
       }
     }
   }
-  console.table(data)
   console.log(result)
 }
 
@@ -172,7 +173,8 @@ handler = async () => {
   const width = data.transposed[0].length - 1
   data.slack = addSlackVar(data.transposed)
   data.simplex = simplex(data.slack)
-  data.result = final(data.simplex, width)
+  console.table(data.simplex)
+  //data.result = final(data.simplex, width)
 
 };
 
