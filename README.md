@@ -1,4 +1,4 @@
-# Project Title
+# Simplex Solver HSHL
 
 Simplex Algorithm Solver in NodeJS
 ### NodeJS Modules:
