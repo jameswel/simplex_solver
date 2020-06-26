@@ -9,7 +9,7 @@ Simplex Algorithm Solver in NodeJS
 ## Getting Started
 
 NodeJS v10.17.0 is tested higher versions should work 
-Install (NodeJS)[https://nodejs.org/en/]
+Install [NodeJS](https://nodejs.org/en/)
 
 ## Usage
 
