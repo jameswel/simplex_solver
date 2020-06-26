@@ -1,15 +1,15 @@
 # Project Title
 
 Simplex Algorithm Solver in NodeJS
+### NodeJS Modules:
+
+[File System](https://nodejs.org/docs/latest-v10.x/api/fs.html)
+[Readline](https://nodejs.org/docs/latest-v10.x/api/readline.html)
 
 ## Getting Started
 
-NodeJS v10.17.0 is tested
-
-Required Modules
-
-FS
-readline
+NodeJS v10.17.0 is tested higher versions should work 
+Install (NodeJS)[https://nodejs.org/en/]
 
 ## Usage
 
